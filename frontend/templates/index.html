@@ -1,0 +1,92 @@
+<!-- frontend/templates/index.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <title>Simulador</title>
+</head>
+<body>
+    <div class="container">
+        <h1 class="color">Simulador de protocolos</h1>
+        <form method="POST" action="/simular">
+            <p id="estado" class="color">Estado de la simulación: En proceso</p>
+            <button id="startBtn" type="submit" name="simular">Iniciar Simulación</button>
+            <select name="protocolo">
+                <option value="0" selected>Protocolo Utopia</option>
+                <option value="1">Protocolo Stop-and-wait</option>
+                <option value="2">Protocolo PAR</option>
+                <option value="3">Protocolo sliding window de 1 bit</option>
+                <option value="4">Protocolo go-back-n</option>
+                <option value="5">Protocolo selective-repeat</option>
+            </select>
+        </form>
+        <br>
+    
+    <button class="btn2" id="reanudarBtn">Reanudar</button>
+    <button class="btn1" id="pausarBtn">Pausar</button>
+    <br>
+    <br>
+    
+    <p><b class="cpu1">CPU A</b>
+
+    <b class="cpu2">CPU B</b></p>
+
+    <br>
+    <!-- Primer cuadro -->
+    <div class="data-box">
+        <div id="info1"></div>
+    </div>
+
+    <!-- Segundo cuadro -->
+    <div class="data-box2">
+        <div id="info2"></div>
+    </div>
+
+    <script>
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+        var socket2 = io.connect('http://' + document.domain + ':' + location.port);
+
+        // Función para actualizar la información en el frontend cuadro 1
+        socket.on('actualizar_info1', function(data) {
+            var infoContainer1 = document.getElementById('info1');
+            var newDiv1 = document.createElement('div');
+            newDiv1.classList.add('newdiv1')
+            newDiv1.innerHTML = data.info1 + '<br><br>';
+            infoContainer1.appendChild(newDiv1);
+        });
+        // Función para actualizar la información en el frontend cuadro 2
+        socket2.on('actualizar_info2', function(data) {
+            var infoContainer2 = document.getElementById('info2');
+            var newDiv2 = document.createElement('div');
+            newDiv2.classList.add('newdiv2')
+            newDiv2.innerHTML = data.info2 + '<br><br>';
+            infoContainer2.appendChild(newDiv2);
+        });
+
+        // Función para enviar comandos al backend para pausar los hilos
+        document.getElementById('pausarBtn').addEventListener('click', function() {
+            socket.emit('pausar');
+            document.getElementById('estado').innerHTML = 'Estado de la simulación: Pausada';
+        });
+
+        // Función para enviar comandos al backend para reanudar los hilos
+        document.getElementById('reanudarBtn').addEventListener('click', function() {
+            socket.emit('reanudar');
+            document.getElementById('estado').innerHTML = 'Estado de la simulación: Reanudada';
+        });
+        // Función para enviar comandos al backend para reiniciar los hilos
+        document.getElementById('startBtn').addEventListener('click', function() {
+            socket.emit('reiniciar');
+            document.getElementById('estado').innerHTML = 'Estado de la simulación: En proceso';
+        });
+
+    </script>
+    
+</div>
+    
+</body>
+</html>

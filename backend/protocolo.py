@@ -1,10 +1,9 @@
 import random
 import time
-import threading
 from datetime import datetime
 # Tamaño máximo del paquete en bytes
 MAX_PKT = 1024
-
+info_hilos = {'info1': '', 'info2': ''}     #Aqui guardo todo lo que el socket va a imprimir en el html
 stop = True
 # Canal de comunicación, aquí guardamos los frames enviados para simular su transmisión
 channel = []
@@ -66,23 +65,30 @@ def from_network_layer():
 
 
 # Simula el envío de un frame a la capa física
-def to_physical_layer(frame):
+def to_physical_layer(frame,socketio):
     global channel
     channel.append(frame)
-    time.sleep(0.3)  # Simula un retraso
-    print(f"Sent frame -> Type: {frame.kind}, Sequence: {frame.seq}, Confirmation: {frame.ack}, Data: {frame.info.data}")
+    time.sleep(0.5)  # Simula un retraso
+    #print(f"Sent frame -> Type: {frame.kind}, Sequence: {frame.seq}, Confirmation: {frame.ack}, Data: {frame.info.data}")
+    info_hilos['info1'] = (f"Sent frame -> Type: {frame.kind}, Sequence: {frame.seq}, Confirmation: {frame.ack}, Data: {frame.info.data}")
+    socketio.emit('actualizar_info1', info_hilos)      #Mando la señal de impresión al Socket
+    
 
 # Simula la recepción de un frame desde la capa física
-def from_physical_layer():
+def from_physical_layer(socketio):
     global channel
     frame = channel.pop(0)
-    time.sleep(0.3)  # Simula un retraso
-    print(f"Received frame -> Type: {frame.kind}, Sequence: {frame.seq}, Confirmation: {frame.ack}, Data: {frame.info.data}")
+    time.sleep(0.5)  # Simula un retraso
+    #print(f"Received frame -> Type: {frame.kind}, Sequence: {frame.seq}, Confirmation: {frame.ack}, Data: {frame.info.data}")
+    info_hilos['info2'] = (f"Received frame -> Type: {frame.kind}, Sequence: {frame.seq}, Confirmation: {frame.ack}, Data: {frame.info.data}")
+    socketio.emit('actualizar_info2', info_hilos)       #Mando la señal de impresión al Socket
     return frame
 
 # Simula el envío de un paquete a la capa de red
-def to_network_layer(packet):
-    print(f"Packet received at Network Layer: {packet.data}")
+def to_network_layer(packet,socketio):
+    #print(f"Packet received at Network Layer: {packet.data}")
+    info_hilos['info2'] = (f"Packet received at Network Layer: {packet.data}")
+    socketio.emit('actualizar_info2', info_hilos)       #Mando la señal de impresión al Socket
     
 
 # Funciones placeholder para timers 
