@@ -1,12 +1,15 @@
 import random
-import string
 import time
-
+import threading
+from datetime import datetime
 # Tamaño máximo del paquete en bytes
 MAX_PKT = 1024
 
+stop = True
 # Canal de comunicación, aquí guardamos los frames enviados para simular su transmisión
 channel = []
+
+
 
 # Tipos de frames
 class FrameKind:
@@ -33,6 +36,8 @@ class Frame:
 # Tipo de eventos posibles
 class EventType:
     FRAME_ARRIVAL = 0
+    CKSUM_ERR = 1
+    TIMEOUT = 2
 
 # Esperar un evento (en este caso, sólo la llegada de un frame)
 def wait_for_event():
@@ -40,6 +45,20 @@ def wait_for_event():
         return EventType.FRAME_ARRIVAL
     return None
 
+def wait_for_event_par(tiempo_inicial):
+    if int(round((datetime.now() - tiempo_inicial ).total_seconds())) < 10:
+        if channel:
+            num = random.randint(1, 10)
+            if num > 8:
+                return EventType.CKSUM_ERR
+            else:
+                return EventType.FRAME_ARRIVAL
+        else: 
+            return None
+    else:
+        return EventType.TIMEOUT
+
+        
 # Simula la obtención de un paquete desde la capa de red
 def from_network_layer():
     data = bytearray(random.getrandbits(8) for _ in range(10))
@@ -64,21 +83,25 @@ def from_physical_layer():
 # Simula el envío de un paquete a la capa de red
 def to_network_layer(packet):
     print(f"Packet received at Network Layer: {packet.data}")
+    
 
 # Funciones placeholder para timers 
-def start_timer(k):
-    pass
+def start_timer():
+    return datetime.now()
 
-def stop_timer(k):
-    pass
+        
+
+def stop_timer(tiempo_inicial):
+    tiempo_inicial = 0
+    return tiempo_inicial
 
 def start_ack_timer():
     pass
 
-# Funciones para habilitación/deshabilitación de capas
 def stop_ack_timer():
     pass
 
+# Funciones para habilitación/deshabilitación de capas
 def enable_network_layer():
     pass
 
@@ -88,3 +111,4 @@ def disable_network_layer():
 # Función para incrementar números de secuencia (similar a una macro en C)
 def inc(k, MAX_SEQ):
     return k + 1 if k < MAX_SEQ else 0
+
