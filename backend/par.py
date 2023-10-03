@@ -9,6 +9,8 @@ turnoS = True
 turnoR = False
 tiempo_inicial = datetime.now()
 
+flag = False
+
 MAX_SEQ = 1
 
 # Función del emisor
@@ -17,7 +19,7 @@ def sender(socketio):
     next_frame_to_send = 0
     buffer = from_network_layer()  # Obtener algo para enviar desde la capa de red
     s = Frame()  # Crear un objeto frame
-    flag = False
+    global flag
     global turnoS
     global turnoR
     if flag == False: 
@@ -53,6 +55,7 @@ def sender(socketio):
                 turnoR = True
                 
             else:
+                from_physical_layer(socketio) #Saca el frame invalido de la lista
                 s.info = buffer  # Copiamos el paquete en s para transmisión
                 s.kind = FrameKind.DATA  # Set the frame kind as data
                 s.seq = next_frame_to_send
