@@ -7,7 +7,7 @@ from datetime import datetime
 RUNNING = True  # Una variable para controlar la ejecución
 tiempo_inicial = datetime.now()
 MAX_SEQ = 1
-
+pausa = False
 turnoA = True
 turnoB = False
 
@@ -33,9 +33,10 @@ def protocol_machineA(socketio,error,___secuencia):
 
     turnoA = False
     turnoB = True
-
+    global pausa
     # Bucle infinito para continuar enviando y recibiendo frames
-    while True:
+    while not pausa:
+        time.sleep(1)
         if turnoA:
             print("turno A")
             event = wait_for_event(error,"sliding",tiempo_inicial)  # Espera un evento, que puede ser la llegada de un frame, un error de suma de comprobación o un tiempo agotado
@@ -87,9 +88,10 @@ def protocol_machineB(socketio,error,___secuencia):
     s.info = buffer  # Inserta el paquete en el frame
     s.seq = next_frame_to_send  # Establece el número de secuencia del frame
     s.ack = 1 - frame_expected  # Establece el número de acuse de recibo, que es el inverso del frame esperado
-    
+    global pausa
     # Bucle infinito para continuar enviando y recibiendo frames
-    while True:
+    while not pausa:
+        time.sleep(1)
         if turnoB:
             print("turno B")
             event = wait_for_event(error,"sliding",tiempo_inicial)  # Espera un evento, que puede ser la llegada de un frame, un error de suma de comprobación o un tiempo agotado

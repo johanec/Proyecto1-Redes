@@ -17,7 +17,6 @@ global secuencia
 # Función crea un emisor dependiendo del protocolo seleccionado
 
 def emisor(socketio):
-    print(error,secuencia,"dsfsdfdsfsdf")
     while RUNNING:
         if activo:
             protocolos[protocolo].sender(socketio,error,secuencia)     #LLama a la función Sender del archivo de la lista
@@ -56,10 +55,12 @@ def protocol_machineB(socketio):
 def detener_simulacion():
     global activo
     activo = False
+    sliding.pausa = True
 # Función que reanuda la simulación 
 def reanudar_simulacion():
     global activo
     activo = True
+    sliding.pausa = False
 
 # Función que reinicia la simulación 
 def reiniciar_simulacion():
@@ -70,7 +71,6 @@ def reiniciar_simulacion():
 
 # Función que genera los hilos
 def simular(socketio,num_protocolo,num_error,num_secuencia):
-    print(num_error,num_secuencia,"oo")
     global protocolo
     global RUNNING
     global error

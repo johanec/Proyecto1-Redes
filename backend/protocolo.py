@@ -42,7 +42,6 @@ class EventType:
 
 
 def wait_for_event(error,protocol, tiempo_inicial=None):
-    print(error,"ssssssss")
     if protocol == "utopia" or protocol == "stop_and_wait":
         if channel:
             return EventType.FRAME_ARRIVAL
