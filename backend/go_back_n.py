@@ -69,26 +69,3 @@ def protocol5():
         else:  # De lo contrario, la deshabilita.
             disable_network_layer()
 
-def to_physical_layer(frame):
-    pass
-
-def start_timer(seq_nr):
-    pass
-
-def enable_network_layer():
-    pass
-
-def from_network_layer():
-    pass
-
-def disable_network_layer():
-    pass
-
-def from_physical_layer():
-    pass
-
-def stop_timer(seq_nr):
-    pass
-
-def to_network_layer(info):
-    pass

@@ -47,6 +47,7 @@ def wait_for_event(protocol, tiempo_inicial=None):
         if channel:
             return EventType.FRAME_ARRIVAL
         return None
+    
     elif protocol in ["par", "sliding", "go_back_n", "selective_repeat"]:
     # Verificar si ha pasado el tiempo límite
         if tiempo_inicial and int(round((datetime.now() - tiempo_inicial).total_seconds())) >= 10:
