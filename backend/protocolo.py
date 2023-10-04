@@ -7,6 +7,7 @@ import threading
 MAX_PKT = 1024
 info_hilos = {'info1': '', 'info2': ''}     #Aqui guardo todo lo que el socket va a imprimir en el html
 stop = True
+network_layer_enabled = True
 
 # Canal de comunicación, aquí guardamos los frames enviados para simular su transmisión
 channel = []
@@ -38,31 +39,29 @@ class EventType:
     FRAME_ARRIVAL = 0
     CKSUM_ERR = 1
     TIMEOUT = 2
-    ACK_TIMEOUT = 3
-    NETWORK_LAYER_READY = 4
+    NETWORK_LAYER_READY = 3
 
-# Esperar un evento (en este caso, sólo la llegada de un frame)
-def wait_for_event():
-    if channel:
-        return EventType.FRAME_ARRIVAL
+
+def wait_for_event(protocol, tiempo_inicial=None):
+    if protocol == "utopia" or protocol == "stop_and_wait":
+        if channel:
+            return EventType.FRAME_ARRIVAL
+        return None
+    elif protocol in ["par", "sliding", "go_back_n", "selective_repeat"]:
+    # Verificar si ha pasado el tiempo límite
+        if tiempo_inicial and int(round((datetime.now() - tiempo_inicial).total_seconds())) >= 10:
+            return EventType.TIMEOUT
+        if channel:
+            num = random.randint(1, 100)  # Usamos un rango de 1-100 para mayor precisión
+            if num <= 70:  # 70% de probabilidad
+                return EventType.FRAME_ARRIVAL
+            elif num <= 90:  # 20% de probabilidad
+                return EventType.CKSUM_ERR
+            elif protocol in ["go_back_n", "selective_repeat"]: # 10% de probabilidad solo en los protocolos en la lista
+                return EventType.NETWORK_LAYER_READY      
     return None
 
-def wait_for_event_par(tiempo_inicial):
-    if int(round((datetime.now() - tiempo_inicial ).total_seconds())) < 10:
-        if channel:
-            num = random.randint(1, 10)
-            if num == 9:
-                return EventType.NETWORK_LAYER_READY
-            if num > 8:
-                return EventType.CKSUM_ERR
-            else:
-                return EventType.FRAME_ARRIVAL
-        else: 
-            return None
-    else:
-        return EventType.TIMEOUT
-
-        
+  
 # Simula la obtención de un paquete desde la capa de red
 def from_network_layer():
     data = bytearray(random.getrandbits(8) for _ in range(10))
@@ -72,6 +71,7 @@ def from_network_layer():
 def to_physical_layer(frame, socketio, machine):
     global channel
     channel.append(frame)
+    
     
     # Determinar qué máquina está llamando a la función
     if machine == "A": # Si es la máquina A
@@ -131,6 +131,13 @@ def stop_timer(tiempo_inicial):
     tiempo_inicial = 0
     return tiempo_inicial
 
+def start_timer_sliding(duration, function):
+    # Inicia un temporizador para llamar a una función después de una duración especificada
+    threading.Timer(duration, function).start()
+
+def timeout_handler():
+    print("Timeout!")
+    
 def start_ack_timer():
     pass
 
@@ -139,12 +146,16 @@ def stop_ack_timer():
 
 # Funciones para habilitación/deshabilitación de capas
 def enable_network_layer():
-    pass
+    global network_layer_enabled
+    network_layer_enabled = True
 
 def disable_network_layer():
-    pass
+    global network_layer_enabled
+    network_layer_enabled = False
+
 
 # Función para incrementar números de secuencia (similar a una macro en C)
 def inc(k, MAX_SEQ):
     return k + 1 if k < MAX_SEQ else 0
+
 
