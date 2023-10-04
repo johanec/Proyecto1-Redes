@@ -28,12 +28,13 @@ def sender(socketio):
         print("Sender: envia el primer paquete")
         to_physical_layer(s,socketio,"A")  # Enviamos el frame a la capa física
         tiempo_inicial = start_timer()
+        time.sleep(3)
         flag = True
         turnoS = False
         turnoR = True
     else:
         if turnoS == True:
-            event = wait_for_event_par(tiempo_inicial)  # Esperamos un evento, la única posibilidad es la llegada de un frame
+            event = wait_for_event("par",tiempo_inicial) 
             
             if event == EventType.FRAME_ARRIVAL:  # Si ha llegado un frame
                 print("Sender: recibe el acknowledge")
@@ -71,7 +72,7 @@ def receiver(socketio):
     global turnoR
     global turnoS
     if turnoR:
-        event = wait_for_event()  # Esperamos un evento, la única posibilidad es la llegada de un frame
+        event = wait_for_event("par",tiempo_inicial)  
         if event == EventType.FRAME_ARRIVAL:  # Si ha llegado un frame
             print("Reciver: recive un paquete")
             r = from_physical_layer(socketio,"B")  # Obtenemos el frame de la capa física
