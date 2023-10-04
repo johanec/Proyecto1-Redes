@@ -1,6 +1,6 @@
 # Importamos las clases y funciones del archivo Protocolo.py
 import threading
-from protocolo import Frame, FrameKind, Packet, inc,start_timer,from_network_layer, to_physical_layer, wait_for_event, wait_for_event_par, from_physical_layer, EventType, to_network_layer
+from protocolo import *
 import time  # Importamos el módulo de tiempo para pausas
 from datetime import datetime
 

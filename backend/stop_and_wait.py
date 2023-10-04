@@ -21,7 +21,7 @@ def sender(socketio):
     else:
         if turnoS == True:
             print("recibe confirmacion")
-            event = wait_for_event()  # Esperamos un evento, la única posibilidad es la llegada de un frame
+            event = wait_for_event("stop_and_wait")  # Esperamos un evento, la única posibilidad es la llegada de un frame
             from_physical_layer(socketio,"A")  # Obtenemos el frame de la capa física
             if event == EventType.FRAME_ARRIVAL:  # Si ha llegado un frame
                 buffer = from_network_layer()  # Obtener algo para enviar desde la capa de red
@@ -40,7 +40,7 @@ def receiver(socketio):
     global turnoR
     global turnoS
     if turnoR:
-        event = wait_for_event()  # Esperamos un evento, la única posibilidad es la llegada de un frame
+        event = wait_for_event("stop_and_wait")  # Esperamos un evento, la única posibilidad es la llegada de un frame
         if event == EventType.FRAME_ARRIVAL:  # Si ha llegado un frame
             print("Se recive un paquete")
             r = from_physical_layer(socketio,"B")  # Obtenemos el frame de la capa física
