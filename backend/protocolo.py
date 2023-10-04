@@ -131,13 +131,6 @@ def stop_timer(tiempo_inicial):
     tiempo_inicial = 0
     return tiempo_inicial
 
-def start_timer_sliding(duration, function):
-    # Inicia un temporizador para llamar a una función después de una duración especificada
-    threading.Timer(duration, function).start()
-
-def timeout_handler():
-    print("Timeout!")
-    
 def start_ack_timer():
     pass
 

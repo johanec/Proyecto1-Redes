@@ -13,6 +13,7 @@ activo = True         #Variable para pausar los hilos
 protocolo = None      #Variable que contiene el numero del protocolo q se usará
 RUNNING = True
 # Función crea un emisor dependiendo del protocolo seleccionado
+
 def emisor(socketio):
     while RUNNING:
         if activo:
@@ -20,6 +21,7 @@ def emisor(socketio):
         time.sleep(1)
     print("emisor cerrado")
     return 0
+
 # Función crea un receptor dependiendo del protocolo seleccionado
 def receptor(socketio):
     while RUNNING:
@@ -29,11 +31,28 @@ def receptor(socketio):
     print("receptor cerrado")
     return 0
 
+# Función crea un receptor dependiendo del protocolo seleccionado
+def protocol_machineA(socketio):
+    while RUNNING:
+        if activo:
+            protocolos[protocolo].protocol_machineA(socketio)    #LLama a la función Receiver del archivo de la lista
+        time.sleep(1)
+    print("Maquina A cerrada")
+    return 0
+
+# Función crea un receptor dependiendo del protocolo seleccionado
+def protocol_machineB(socketio):
+    while RUNNING:
+        if activo:
+            protocolos[protocolo].protocol_machineB(socketio)    #LLama a la función Receiver del archivo de la lista
+        time.sleep(1)
+    print("Maquina B cerrada")
+    return 0
+
 # Función que detiene la simulación 
 def detener_simulacion():
     global activo
     activo = False
-    
 # Función que reanuda la simulación 
 def reanudar_simulacion():
     global activo
@@ -53,7 +72,15 @@ def simular(socketio,num_protocolo):
     protocolo = int(num_protocolo)
     time.sleep(2)
     RUNNING = True
-    emisor_thread = threading.Thread(target=emisor,args=(socketio,))  # Creamos un hilo para el emisor
-    receptor_thread = threading.Thread(target=receptor,args=(socketio,))  # Creamos un hilo para el emisor
-    emisor_thread.start()  # Iniciamos el hilo del emisor
-    receptor_thread.start()  # Iniciamos el hilo del emisor
+    if(protocolo < 3):
+        emisor_thread = threading.Thread(target=emisor,args=(socketio,))  # Creamos un hilo para el emisor
+        receptor_thread = threading.Thread(target=receptor,args=(socketio,))  # Creamos un hilo para el emisor
+        emisor_thread.start()  # Iniciamos el hilo del emisor
+        receptor_thread.start()  # Iniciamos el hilo del emisor
+    else:
+        maquina_a_thread = threading.Thread(target=protocol_machineA,args=(socketio,))  # Creamos un hilo para el emisor
+        maquina_b_thread = threading.Thread(target=protocol_machineB,args=(socketio,))  # Creamos un hilo para el emisor
+        maquina_a_thread.start()  # Iniciamos el hilo del emisor
+        maquina_b_thread.start()  # Iniciamos el hilo del emisor
+
+

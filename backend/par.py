@@ -28,7 +28,6 @@ def sender(socketio):
         print("Sender: envia el primer paquete")
         to_physical_layer(s,socketio,"A")  # Enviamos el frame a la capa física
         tiempo_inicial = start_timer()
-        time.sleep(3)
         flag = True
         turnoS = False
         turnoR = True
