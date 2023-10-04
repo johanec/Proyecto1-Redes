@@ -33,7 +33,9 @@ def reiniciar():
 def procesar_formulario():
     if request.method == 'POST':                    #Obtiene el formulario del HTML
         protocolo = request.form.get("protocolo")   #Saca el valor del formulario con la etiqueta "protocolo"
-        simular(socketio,protocolo)                 #Paso datos a "simulador.py"
+        error = int(request.form.get("error"))
+        secuencia = int(request.form.get("secuencia"))
+        simular(socketio,protocolo,error,secuencia)                 #Paso datos a "simulador.py"
         return render_template('index.html')        #Muestro de nuevo el HTML 
 
 if __name__ == '__main__':

@@ -13,7 +13,7 @@ flag = False
 MAX_SEQ = 1
 
 # Función del emisor
-def sender(socketio):
+def sender(socketio,error,___secuencia):
     global tiempo_inicial
     next_frame_to_send = 0
     buffer = from_network_layer()  # Obtener algo para enviar desde la capa de red
@@ -34,7 +34,7 @@ def sender(socketio):
         turnoR = True
     else:
         if turnoS == True:
-            event = wait_for_event("par",tiempo_inicial) 
+            event = wait_for_event(error,"par",tiempo_inicial) 
             
             if event == EventType.FRAME_ARRIVAL:  # Si ha llegado un frame
                 print("Sender: recibe el acknowledge")
@@ -65,14 +65,14 @@ def sender(socketio):
                 turnoR = True
 
 # Función del receptor
-def receiver(socketio):
+def receiver(socketio,error,___secuencia):
     frame_espected = 0
     r = Frame()
     s = Frame()
     global turnoR
     global turnoS
     if turnoR:
-        event = wait_for_event("par",tiempo_inicial)  
+        event = wait_for_event(error,"par",tiempo_inicial)  
         if event == EventType.FRAME_ARRIVAL:  # Si ha llegado un frame
             print("Reciver: recive un paquete")
             r = from_physical_layer(socketio,"B")  # Obtenemos el frame de la capa física

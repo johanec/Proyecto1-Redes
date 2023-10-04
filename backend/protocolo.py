@@ -8,7 +8,6 @@ MAX_PKT = 1024
 info_hilos = {'info1': '', 'info2': ''}     #Aqui guardo todo lo que el socket va a imprimir en el html
 stop = True
 network_layer_enabled = True
-
 # Canal de comunicación, aquí guardamos los frames enviados para simular su transmisión
 channel = []
 
@@ -42,7 +41,8 @@ class EventType:
     NETWORK_LAYER_READY = 3
 
 
-def wait_for_event(protocol, tiempo_inicial=None):
+def wait_for_event(error,protocol, tiempo_inicial=None):
+    print(error,"ssssssss")
     if protocol == "utopia" or protocol == "stop_and_wait":
         if channel:
             return EventType.FRAME_ARRIVAL
@@ -53,10 +53,10 @@ def wait_for_event(protocol, tiempo_inicial=None):
         if tiempo_inicial and int(round((datetime.now() - tiempo_inicial).total_seconds())) >= 10:
             return EventType.TIMEOUT
         if channel:
-            num = random.randint(1, 100)  # Usamos un rango de 1-100 para mayor precisión
-            if num <= 70:  # 70% de probabilidad
+            #num = random.randint(1, 100)  # Usamos un rango de 1-100 para mayor precisión
+            if error <= 70:  # 70% de probabilidad
                 return EventType.FRAME_ARRIVAL
-            elif num <= 90:  # 20% de probabilidad
+            elif error <= 90:  # 20% de probabilidad
                 return EventType.CKSUM_ERR
             elif protocol in ["go_back_n", "selective_repeat"]: # 10% de probabilidad solo en los protocolos en la lista
                 return EventType.NETWORK_LAYER_READY      
@@ -72,7 +72,6 @@ def from_network_layer():
 def to_physical_layer(frame, socketio, machine):
     global channel
     channel.append(frame)
-    
     
     # Determinar qué máquina está llamando a la función
     if machine == "A": # Si es la máquina A
@@ -91,7 +90,6 @@ def to_physical_layer(frame, socketio, machine):
 def from_physical_layer(socketio, machine):
     global channel
     frame = channel.pop(0)
-    
     # Determinar qué máquina está llamando a la función
     if machine == "A": # Si es la máquina A
         info_hilos['info1'] = (f"Received frame -> Type: {frame.kind}, Sequence: {frame.seq}, Confirmation: {frame.ack}, Data: {frame.info.data}")
@@ -110,7 +108,6 @@ def from_physical_layer(socketio, machine):
 
 # Simula el envío de un paquete a la capa de red
 def to_network_layer(packet, socketio, machine):
-    
     # Determinar qué máquina está llamando a la función
     if machine == "A": # Si es la máquina A
         info_hilos['info1'] = (f"Packet received at Network Layer: {packet.data}")

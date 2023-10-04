@@ -54,7 +54,7 @@ button:hover {
 
 .data-box {
     width:45%;
-    height: 400px;
+    height: 500px;
     padding: 2px;
     border: 2px solid white;
     float: left;
@@ -63,7 +63,7 @@ button:hover {
 }
 .data-box2 {
     width:45%;
-    height: 400px;
+    height: 500px;
     padding: 2px;
     border: 2px solid white;
     float: right;
@@ -90,6 +90,7 @@ select{
 .newdiv1 {
     background-color: #DCEDC8 ;
     width: 100%;
+    height: 50px;
     color: black;
     border: 1px solid white;
     border-radius: 5px;
@@ -98,6 +99,7 @@ select{
 .newdiv2 {
     background-color: #B3E5FC;
     width: 100%;
+    height: 50px;
     color: black;
     border: 1px solid white;
     border-radius: 5px;

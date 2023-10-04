@@ -12,7 +12,7 @@ turnoA = True
 turnoB = False
 
 # Función del emisor
-def protocol_machineA(socketio):
+def protocol_machineA(socketio,error,___secuencia):
     print("turno A")
     global turnoA
     global turnoB
@@ -38,7 +38,7 @@ def protocol_machineA(socketio):
     while True:
         if turnoA:
             print("turno A")
-            event = wait_for_event("sliding",tiempo_inicial)  # Espera un evento, que puede ser la llegada de un frame, un error de suma de comprobación o un tiempo agotado
+            event = wait_for_event(error,"sliding",tiempo_inicial)  # Espera un evento, que puede ser la llegada de un frame, un error de suma de comprobación o un tiempo agotado
             
             # Si se recibe un frame
             if event == EventType.FRAME_ARRIVAL:
@@ -73,7 +73,7 @@ def protocol_machineA(socketio):
             turnoA = False
             turnoB = True
 
-def protocol_machineB(socketio):
+def protocol_machineB(socketio,error,___secuencia):
 
     global turnoA
     global turnoB
@@ -92,7 +92,7 @@ def protocol_machineB(socketio):
     while True:
         if turnoB:
             print("turno B")
-            event = wait_for_event("sliding",tiempo_inicial)  # Espera un evento, que puede ser la llegada de un frame, un error de suma de comprobación o un tiempo agotado
+            event = wait_for_event(error,"sliding",tiempo_inicial)  # Espera un evento, que puede ser la llegada de un frame, un error de suma de comprobación o un tiempo agotado
             
             # Si se recibe un frame
             if event == EventType.FRAME_ARRIVAL:

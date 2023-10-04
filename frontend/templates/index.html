@@ -14,6 +14,12 @@
         <h1 class="color">Simulador de protocolos</h1>
         <form method="POST" action="/simular">
             <p id="estado" class="color">Estado de la simulación: En proceso</p>
+            <br>
+                <input type="text" id="error" name="error" placeholder="Tasa de errores (1~100)" required> 
+            <br>
+                <input type="text" id="secuencia" name="secuencia" placeholder="Número de secuencia" required> 
+                <br>
+                <br>
             <button id="startBtn" type="submit" name="simular">Iniciar Simulación</button>
             <select name="protocolo">
                 <option value="0" selected>Protocolo Utopia</option>

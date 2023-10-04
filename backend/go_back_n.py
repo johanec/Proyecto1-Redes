@@ -28,7 +28,7 @@ def protocol5():
 
     # Bucle principal del protocolo.
     while True:
-        event = wait_for_event("go_back_n")  # Espera un evento.
+        event = wait_for_event(50,"go_back_n")  # Espera un evento.
         
         # Si la capa de red está lista para enviar un paquete.
         if event == EventType.NETWORK_LAYER_READY:

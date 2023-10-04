@@ -12,12 +12,15 @@ protocolos = [utopia,stop_and_wait,par,sliding]     #Contiene los protocolos(Arc
 activo = True         #Variable para pausar los hilos
 protocolo = None      #Variable que contiene el numero del protocolo q se usará
 RUNNING = True
+global error
+global secuencia
 # Función crea un emisor dependiendo del protocolo seleccionado
 
 def emisor(socketio):
+    print(error,secuencia,"dsfsdfdsfsdf")
     while RUNNING:
         if activo:
-            protocolos[protocolo].sender(socketio)     #LLama a la función Sender del archivo de la lista
+            protocolos[protocolo].sender(socketio,error,secuencia)     #LLama a la función Sender del archivo de la lista
         time.sleep(1)
     print("emisor cerrado")
     return 0
@@ -26,7 +29,7 @@ def emisor(socketio):
 def receptor(socketio):
     while RUNNING:
         if activo:
-            protocolos[protocolo].receiver(socketio)    #LLama a la función Receiver del archivo de la lista
+            protocolos[protocolo].receiver(socketio,error,secuencia)    #LLama a la función Receiver del archivo de la lista
         time.sleep(1)
     print("receptor cerrado")
     return 0
@@ -35,7 +38,7 @@ def receptor(socketio):
 def protocol_machineA(socketio):
     while RUNNING:
         if activo:
-            protocolos[protocolo].protocol_machineA(socketio)    #LLama a la función Receiver del archivo de la lista
+            protocolos[protocolo].protocol_machineA(socketio,error,secuencia)    #LLama a la función Receiver del archivo de la lista
         time.sleep(1)
     print("Maquina A cerrada")
     return 0
@@ -44,7 +47,7 @@ def protocol_machineA(socketio):
 def protocol_machineB(socketio):
     while RUNNING:
         if activo:
-            protocolos[protocolo].protocol_machineB(socketio)    #LLama a la función Receiver del archivo de la lista
+            protocolos[protocolo].protocol_machineB(socketio,error,secuencia)    #LLama a la función Receiver del archivo de la lista
         time.sleep(1)
     print("Maquina B cerrada")
     return 0
@@ -66,9 +69,14 @@ def reiniciar_simulacion():
     activo = True
 
 # Función que genera los hilos
-def simular(socketio,num_protocolo):
+def simular(socketio,num_protocolo,num_error,num_secuencia):
+    print(num_error,num_secuencia,"oo")
     global protocolo
     global RUNNING
+    global error
+    global secuencia
+    error = num_error
+    secuencia = num_secuencia
     protocolo = int(num_protocolo)
     time.sleep(2)
     RUNNING = True
