@@ -1,8 +1,7 @@
-# Importamos las clases y funciones del archivo Protocolo.py
-from protocolo import Frame, FrameKind, Packet, inc,start_timer,from_network_layer, to_physical_layer, wait_for_event, wait_for_event_par, from_physical_layer, EventType, to_network_layer
+# Importamos las clases y funciones del archivo protocolo.py
+from protocolo import *
 import time  # Importamos el módulo de tiempo para pausas
 from datetime import datetime
-
 
 RUNNING = True  # Una variable para controlar la ejecución
 turnoS = True
@@ -27,7 +26,7 @@ def sender(socketio):
         s.kind = FrameKind.DATA  # Set the frame kind as data
         s.seq = next_frame_to_send
         print("Sender: envia el primer paquete")
-        to_physical_layer(s,socketio)  # Enviamos el frame a la capa física
+        to_physical_layer(s,socketio,"A")  # Enviamos el frame a la capa física
         tiempo_inicial = start_timer()
         time.sleep(3)
         flag = True
@@ -39,7 +38,7 @@ def sender(socketio):
             
             if event == EventType.FRAME_ARRIVAL:  # Si ha llegado un frame
                 print("Sender: recibe el acknowledge")
-                s = from_physical_layer(socketio)  # Obtenemos el frame de la capa física
+                s = from_physical_layer(socketio,"A")  # Obtenemos el frame de la capa física
                 if (s.ack == next_frame_to_send):
                     buffer = from_network_layer()
                     next_frame_to_send = inc(next_frame_to_send,MAX_SEQ)
@@ -49,18 +48,18 @@ def sender(socketio):
                 s.kind = FrameKind.DATA  # Set the frame kind as data
                 s.seq = next_frame_to_send
                 print("Sender: envia el paquete que sigue en la secuencia")
-                to_physical_layer(s,socketio)  # Enviamos el frame a la capa física
+                to_physical_layer(s,socketio,"A")  # Enviamos el frame a la capa física
                 tiempo_inicial = start_timer()
                 turnoS = False
                 turnoR = True
                 
             else:
-                from_physical_layer(socketio) #Saca el frame invalido de la lista
+                from_physical_layer(socketio,"A") #Saca el frame invalido de la lista
                 s.info = buffer  # Copiamos el paquete en s para transmisión
                 s.kind = FrameKind.DATA  # Set the frame kind as data
                 s.seq = next_frame_to_send
                 print("Sender: vuelve a enviar el paquete dañado")
-                to_physical_layer(s,socketio)  # Enviamos el frame a la capa física
+                to_physical_layer(s,socketio,"A")  # Enviamos el frame a la capa física
                 tiempo_inicial = start_timer()
                 turnoS = False
                 turnoR = True
@@ -76,13 +75,13 @@ def receiver(socketio):
         event = wait_for_event()  # Esperamos un evento, la única posibilidad es la llegada de un frame
         if event == EventType.FRAME_ARRIVAL:  # Si ha llegado un frame
             print("Reciver: recive un paquete")
-            r = from_physical_layer(socketio)  # Obtenemos el frame de la capa física
+            r = from_physical_layer(socketio,"B")  # Obtenemos el frame de la capa física
             if (r.seq == frame_espected):
-                to_network_layer(r.info,socketio)  # Enviamos la información del frame a la capa de red
+                to_network_layer(r.info,socketio,"B")  # Enviamos la información del frame a la capa de red
                 frame_espected = inc(frame_espected,MAX_SEQ)
             s.info = Packet("Acknowledge!")  # Se envia un dummy para confirmarle al emisor
             s.ack = 1 - frame_espected
             print("Reciver se envia el acknowledge")
-            to_physical_layer(s,socketio)
+            to_physical_layer(s,socketio,"B")
             turnoS = True
             turnoR = False

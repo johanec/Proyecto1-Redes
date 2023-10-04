@@ -1,5 +1,5 @@
-# Importamos las clases y funciones del archivo Protocolo.py
-from protocolo import Frame, FrameKind, Packet, from_network_layer, to_physical_layer, wait_for_event, from_physical_layer, EventType, to_network_layer
+# Importamos las clases y funciones del archivo protocolo.py
+from protocolo import *
 turnoS = True
 turnoR = False
 flag = False
@@ -14,14 +14,14 @@ def sender(socketio):
         s.info = buffer  # Copiamos el paquete en s para transmisión
         s.kind = FrameKind.DATA  # Set the frame kind as data
         print("Se envia el primer paquete")
-        to_physical_layer(s,socketio)  # Enviamos el frame a la capa física
+        to_physical_layer(s,socketio,"A")  # Enviamos el frame a la capa física
         flag = True
         turnoS = False
         turnoR = True
     else:
         if turnoS == True:
             print("recibe confirmacion")
-            from_physical_layer(socketio)  # Obtenemos el frame de la capa física
+            from_physical_layer(socketio,"A")  # Obtenemos el frame de la capa física
             event = wait_for_event()  # Esperamos un evento, la única posibilidad es la llegada de un frame
             if event == EventType.FRAME_ARRIVAL:  # Si ha llegado un frame
                 buffer = from_network_layer()  # Obtener algo para enviar desde la capa de red
@@ -29,7 +29,7 @@ def sender(socketio):
                 s.info = buffer  # Copiamos el paquete en s para transmisión
                 s.kind = FrameKind.DATA  # Set the frame kind as data
                 print("Se envia otro paquete")
-                to_physical_layer(s,socketio)  # Enviamos el frame a la capa física
+                to_physical_layer(s,socketio,"A")  # Enviamos el frame a la capa física
                 flag = True
                 turnoS = False
                 turnoR = True
@@ -43,11 +43,11 @@ def receiver(socketio):
         event = wait_for_event()  # Esperamos un evento, la única posibilidad es la llegada de un frame
         if event == EventType.FRAME_ARRIVAL:  # Si ha llegado un frame
             print("Se recive un paquete")
-            r = from_physical_layer(socketio)  # Obtenemos el frame de la capa física
-            to_network_layer(r.info,socketio)  # Enviamos la información del frame a la capa de red
+            r = from_physical_layer(socketio,"B")  # Obtenemos el frame de la capa física
+            to_network_layer(r.info,socketio,"B")  # Enviamos la información del frame a la capa de red
             s = Frame()
             s.info = Packet("dummy!")  # Se envia un dummy para confirmarle al emisor
             print("Se envia dummy de confirmacion")
-            to_physical_layer(s,socketio)
+            to_physical_layer(s,socketio,"B")
             turnoS = True
             turnoR = False

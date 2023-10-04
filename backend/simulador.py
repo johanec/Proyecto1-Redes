@@ -4,10 +4,11 @@ import time
 import utopia
 import stop_and_wait
 import par
+import sliding
 #import ...
 
 # Agregar a la lista los nuevos protocolos
-protocolos = [utopia,stop_and_wait,par]     #Contiene los protocolos(Archivos py)
+protocolos = [utopia,stop_and_wait,par,sliding]     #Contiene los protocolos(Archivos py)
 activo = True         #Variable para pausar los hilos
 protocolo = None      #Variable que contiene el numero del protocolo q se usará
 RUNNING = True
@@ -32,6 +33,7 @@ def receptor(socketio):
 def detener_simulacion():
     global activo
     activo = False
+    
 # Función que reanuda la simulación 
 def reanudar_simulacion():
     global activo

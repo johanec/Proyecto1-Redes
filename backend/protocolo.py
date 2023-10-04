@@ -7,10 +7,9 @@ import threading
 MAX_PKT = 1024
 info_hilos = {'info1': '', 'info2': ''}     #Aqui guardo todo lo que el socket va a imprimir en el html
 stop = True
+
 # Canal de comunicación, aquí guardamos los frames enviados para simular su transmisión
 channel = []
-channel_A_to_B = []
-channel_B_to_A = []
 
 # Tipos de frames
 class FrameKind:
@@ -39,7 +38,8 @@ class EventType:
     FRAME_ARRIVAL = 0
     CKSUM_ERR = 1
     TIMEOUT = 2
-    NETWORK_LAYER_READY = 3
+    ACK_TIMEOUT = 3
+    NETWORK_LAYER_READY = 4
 
 # Esperar un evento (en este caso, sólo la llegada de un frame)
 def wait_for_event():
@@ -68,62 +68,60 @@ def from_network_layer():
     data = bytearray(random.getrandbits(8) for _ in range(10))
     return Packet(data)
 
-
 # Simula el envío de un frame a la capa física
-def to_physical_layer(frame,socketio):
+def to_physical_layer(frame, socketio, machine):
     global channel
     channel.append(frame)
-    time.sleep(0.5)  # Simula un retraso
-    #print(f"Sent frame -> Type: {frame.kind}, Sequence: {frame.seq}, Confirmation: {frame.ack}, Data: {frame.info.data}")
-    info_hilos['info1'] = (f"Sent frame -> Type: {frame.kind}, Sequence: {frame.seq}, Confirmation: {frame.ack}, Data: {frame.info.data}")
-    socketio.emit('actualizar_info1', info_hilos)      #Mando la señal de impresión al Socket
     
+    # Determinar qué máquina está llamando a la función
+    if machine == "A": # Si es la máquina A
+        info_hilos['info1'] = (f"Sent frame -> Type: {frame.kind}, Sequence: {frame.seq}, Confirmation: {frame.ack}, Data: {frame.info.data}")
+        info_hilos['info2'] = ("-")
+        socketio.emit('actualizar_info1', info_hilos)  
+        socketio.emit('actualizar_info2', info_hilos)  
+
+    elif machine == "B": # Si es la máquina B
+        info_hilos['info2'] = (f"Sent frame -> Type: {frame.kind}, Sequence: {frame.seq}, Confirmation: {frame.ack}, Data: {frame.info.data}")
+        info_hilos['info1'] = ("-")
+        socketio.emit('actualizar_info2', info_hilos)  
+        socketio.emit('actualizar_info1', info_hilos)  
 
 # Simula la recepción de un frame desde la capa física
-def from_physical_layer(socketio):
+def from_physical_layer(socketio, machine):
     global channel
     frame = channel.pop(0)
-    time.sleep(0.5)  # Simula un retraso
-    #print(f"Received frame -> Type: {frame.kind}, Sequence: {frame.seq}, Confirmation: {frame.ack}, Data: {frame.info.data}")
-    info_hilos['info2'] = (f"Received frame -> Type: {frame.kind}, Sequence: {frame.seq}, Confirmation: {frame.ack}, Data: {frame.info.data}")
-    socketio.emit('actualizar_info2', info_hilos)       #Mando la señal de impresión al Socket
+    
+    # Determinar qué máquina está llamando a la función
+    if machine == "A": # Si es la máquina A
+        info_hilos['info1'] = (f"Received frame -> Type: {frame.kind}, Sequence: {frame.seq}, Confirmation: {frame.ack}, Data: {frame.info.data}")
+        info_hilos['info2'] = ("-")
+        socketio.emit('actualizar_info1', info_hilos)  
+        socketio.emit('actualizar_info2', info_hilos)  
+
+    elif machine == "B": # Si es la máquina B
+        info_hilos['info2'] = (f"Received frame -> Type: {frame.kind}, Sequence: {frame.seq}, Confirmation: {frame.ack}, Data: {frame.info.data}")
+        info_hilos['info1'] = ("-")
+        socketio.emit('actualizar_info2', info_hilos)  
+        socketio.emit('actualizar_info1', info_hilos)  
+
     return frame
+
 
 # Simula el envío de un paquete a la capa de red
-def to_network_layer(packet,socketio):
-    #print(f"Packet received at Network Layer: {packet.data}")
-    info_hilos['info2'] = (f"Packet received at Network Layer: {packet.data}")
-    socketio.emit('actualizar_info2', info_hilos)       #Mando la señal de impresión al Socket
+def to_network_layer(packet, socketio, machine):
     
-def to_physical_layer_from_A(frame):
-    global channel_A_to_B
-    channel_A_to_B.append(frame)
-    time.sleep(0.3)
-    print(f"A sent frame -> Type: {frame.kind}, Sequence: {frame.seq}, Confirmation: {frame.ack}, Data: {frame.info.data}")
+    # Determinar qué máquina está llamando a la función
+    if machine == "A": # Si es la máquina A
+        info_hilos['info1'] = (f"Packet received at Network Layer: {packet.data}")
+        info_hilos['info2'] = ("-")
+        socketio.emit('actualizar_info1', info_hilos)  
+        socketio.emit('actualizar_info2', info_hilos)  
 
-def to_physical_layer_from_B(frame):
-    global channel_B_to_A
-    channel_B_to_A.append(frame)
-    time.sleep(0.3)
-    print(f"B sent frame -> Type: {frame.kind}, Sequence: {frame.seq}, Confirmation: {frame.ack}, Data: {frame.info.data}")
-
-def from_physical_layer_at_A():
-    global channel_B_to_A
-    if not channel_B_to_A:  # Verifica si el canal está vacío
-        return None
-    frame = channel_B_to_A.pop(0)
-    time.sleep(0.3)
-    print(f"A received frame -> Type: {frame.kind}, Sequence: {frame.seq}, Confirmation: {frame.ack}, Data: {frame.info.data}")
-    return frame
-
-def from_physical_layer_at_B():
-    global channel_A_to_B
-    if not channel_A_to_B:  # Verifica si el canal está vacío
-        return None
-    frame = channel_A_to_B.pop(0)
-    time.sleep(0.3)
-    print(f"B received frame -> Type: {frame.kind}, Sequence: {frame.seq}, Confirmation: {frame.ack}, Data: {frame.info.data}")
-    return frame
+    elif machine == "B": # Si es la máquina B
+        info_hilos['info2'] = (f"Packet received at Network Layer: {packet.data}")
+        info_hilos['info1'] = ("-")
+        socketio.emit('actualizar_info2', info_hilos)  
+        socketio.emit('actualizar_info1', info_hilos)  
 
 # Funciones placeholder para timers 
 def start_timer():
