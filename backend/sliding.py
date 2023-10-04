@@ -4,7 +4,6 @@ from protocolo import Frame, FrameKind, Packet, inc,start_timer,from_network_lay
 import time  # Importamos el módulo de tiempo para pausas
 from datetime import datetime
 
-
 RUNNING = True  # Una variable para controlar la ejecución
 tiempo_inicial = datetime.now()
 MAX_SEQ = 1
@@ -39,7 +38,7 @@ def protocol_machineA(socketio):
     while True:
         if turnoA:
             print("turno A")
-            event = wait_for_event_par(tiempo_inicial)  # Espera un evento, que puede ser la llegada de un frame, un error de suma de comprobación o un tiempo agotado
+            event = wait_for_event("sliding",tiempo_inicial)  # Espera un evento, que puede ser la llegada de un frame, un error de suma de comprobación o un tiempo agotado
             
             # Si se recibe un frame
             if event == EventType.FRAME_ARRIVAL:
@@ -93,7 +92,7 @@ def protocol_machineB(socketio):
     while True:
         if turnoB:
             print("turno B")
-            event = wait_for_event_par(tiempo_inicial)  # Espera un evento, que puede ser la llegada de un frame, un error de suma de comprobación o un tiempo agotado
+            event = wait_for_event("sliding",tiempo_inicial)  # Espera un evento, que puede ser la llegada de un frame, un error de suma de comprobación o un tiempo agotado
             
             # Si se recibe un frame
             if event == EventType.FRAME_ARRIVAL:
@@ -126,5 +125,3 @@ def protocol_machineB(socketio):
             tiempo_inicial = start_timer()
             turnoA = True
             turnoB = False
-
-
